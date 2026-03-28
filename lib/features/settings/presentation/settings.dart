@@ -7,6 +7,8 @@ import 'package:expense_bud/features/expense/presentation/provider/expense_provi
 import 'package:expense_bud/features/settings/domain/entities/user_preference.dart';
 import 'package:expense_bud/features/settings/presentation/inbox_amount_settings.dart';
 import 'package:expense_bud/features/settings/presentation/providers/settings_provider.dart';
+import 'package:expense_bud/features/sms/presentation/pages/category_mapping_page.dart';
+import 'package:expense_bud/features/sms/presentation/pages/sms_reader_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -44,6 +46,16 @@ class _SettingsPageState extends State<SettingsPage> {
                   'Inbox Amount',
                   trailing: prefs.inboxAmount.title,
                   onTap: () => context.push(const InboxAmountSettingsPage()),
+                ),
+                DefaultSettingItem(
+                  'Import M-PESA SMS',
+                  trailing: 'Auto-Import',
+                  onTap: () => context.push(const SmsReaderPage()),
+                ),
+                DefaultSettingItem(
+                  'M-PESA Category Mapping',
+                  trailing: 'Manage',
+                  onTap: () => context.push(const CategoryMappingPage()),
                 ),
                 SwitchSettingItem(
                   'Show Date',

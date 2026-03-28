@@ -5,6 +5,7 @@ import 'package:expense_bud/core/presentation/onboarding.dart';
 import 'package:expense_bud/features/expense/presentation/provider/expense_provider.dart';
 import 'package:expense_bud/features/insights/presentation/provider/insights_provider.dart';
 import 'package:expense_bud/features/settings/presentation/providers/settings_provider.dart';
+import 'package:expense_bud/features/sms/presentation/provider/sms_provider.dart';
 import 'package:expense_bud/injector.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -25,6 +26,7 @@ class ExpenseTracker extends StatelessWidget {
         ChangeNotifierProvider<ExpenseProvider>(create: (context) => getIt()),
         ChangeNotifierProvider<InsightsProvider>(create: (context) => getIt()),
         ChangeNotifierProvider<SettingsProvider>(create: (context) => getIt()),
+        ChangeNotifierProvider<SmsProvider>(create: (context) => getIt()),
       ],
       child: Builder(builder: (context) {
         final onboardingComplete = context.select<SettingsProvider, bool>(

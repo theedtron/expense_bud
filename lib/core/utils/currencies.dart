@@ -8,5 +8,7 @@ const jpy = CurrencyEntity(name: 'JPY', locale: "en_JP", symbol: "\u00A5");
 const inr = CurrencyEntity(name: 'INR', locale: "en_IN", symbol: "\u20B9");
 const brl =
     CurrencyEntity(name: 'BRL', locale: "pt_BR", symbol: "\u0052\u0024");
+const tsh = CurrencyEntity(name: 'TSH', locale: "en_TZ", symbol: "\u20A6");
+const kes = CurrencyEntity(name: 'KES', locale: "en_KE", symbol: "KSh");
 
-List<CurrencyEntity> currencyList() => [usd, eur, gbp, ngn, jpy, inr, brl];
+List<CurrencyEntity> currencyList() => [usd, eur, gbp, ngn, jpy, inr, brl, tsh, kes];

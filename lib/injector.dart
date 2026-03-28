@@ -21,6 +21,25 @@ import 'package:expense_bud/features/settings/domain/repositories/user_preferenc
 import 'package:expense_bud/features/settings/domain/usecases/get_user_preference_usecase.dart';
 import 'package:expense_bud/features/settings/domain/usecases/update_user_preference_usecase.dart';
 import 'package:expense_bud/features/settings/presentation/providers/settings_provider.dart';
+import 'package:expense_bud/features/sms/data/datasources/business_local_datasource.dart';
+import 'package:expense_bud/features/sms/data/datasources/person_local_datasource.dart';
+import 'package:expense_bud/features/sms/data/datasources/sms_local_datasource.dart';
+import 'package:expense_bud/features/sms/data/models/business_model.dart';
+import 'package:expense_bud/features/sms/data/models/person_model.dart';
+import 'package:expense_bud/features/sms/data/repositories/business_repository_impl.dart';
+import 'package:expense_bud/features/sms/data/repositories/person_repository_impl.dart';
+import 'package:expense_bud/features/sms/data/repositories/sms_repository_impl.dart';
+import 'package:expense_bud/features/sms/domain/repositories/business_repository.dart';
+import 'package:expense_bud/features/sms/domain/repositories/person_repository.dart';
+import 'package:expense_bud/features/sms/domain/repositories/sms_repository.dart';
+import 'package:expense_bud/features/sms/domain/usecases/get_business_by_name_usecase.dart';
+import 'package:expense_bud/features/sms/domain/usecases/get_businesses_usecase.dart';
+import 'package:expense_bud/features/sms/domain/usecases/get_mpesa_sms_usecase.dart';
+import 'package:expense_bud/features/sms/domain/usecases/get_persons_usecase.dart';
+import 'package:expense_bud/features/sms/domain/usecases/request_sms_permission_usecase.dart';
+import 'package:expense_bud/features/sms/domain/usecases/save_business_usecase.dart';
+import 'package:expense_bud/features/sms/domain/usecases/save_person_usecase.dart';
+import 'package:expense_bud/features/sms/presentation/provider/sms_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -35,9 +54,13 @@ Future<void> initApp() async {
   Hive.registerAdapter<ExpenseModel>(ExpenseModelAdapter());
   Hive.registerAdapter<UserPreferenceModel>(UserPreferenceModelAdapter());
   Hive.registerAdapter<CurrencyModel>(CurrencyModelAdapter());
+  Hive.registerAdapter<BusinessModel>(BusinessModelAdapter());
+  Hive.registerAdapter<PersonModel>(PersonModelAdapter());
 
   final _expenseDb = await Hive.openBox("expenses.db");
   final _preferenceDb = await Hive.openBox("preferences.db");
+  final _businessDb = await Hive.openBox<BusinessModel>("businesses.db");
+  final _personDb = await Hive.openBox<PersonModel>("persons.db");
 
   final _notification = AwesomeNotifications();
 
@@ -52,12 +75,23 @@ Future<void> initApp() async {
       InsightLocalDataSource(_expenseDb));
   getIt.registerSingleton<IUserPreferenceLocalDataSource>(
       UserPreferenceLocalDataSource(_preferenceDb));
+  getIt.registerSingleton<ISmsLocalDataSource>(
+      SmsLocalDataSource());
+  getIt.registerSingleton<BusinessLocalDatasource>(
+      BusinessLocalDatasourceImpl(businessBox: _businessDb));
+  getIt.registerSingleton<PersonLocalDatasource>(
+      PersonLocalDatasourceImpl(personBox: _personDb));
 
   /// repositories
   getIt.registerSingleton<IExpenseRepository>(ExpenseRepository(getIt()));
   getIt.registerSingleton<IInsightRepository>(InsightRepository(getIt()));
   getIt.registerSingleton<IUserPreferenceRepository>(
       UserPreferenceRepository(getIt()));
+  getIt.registerSingleton<ISmsRepository>(SmsRepository(getIt()));
+  getIt.registerSingleton<BusinessRepository>(
+      BusinessRepositoryImpl(localDatasource: getIt()));
+  getIt.registerSingleton<PersonRepository>(
+      PersonRepositoryImpl(localDatasource: getIt()));
 
   /// usecases
   getIt.registerSingleton<GetExpensesUsecase>(GetExpensesUsecase(getIt()));
@@ -69,6 +103,14 @@ Future<void> initApp() async {
   getIt.registerSingleton<UpdateUserPreferenceUsecase>(
       UpdateUserPreferenceUsecase(getIt()));
   getIt.registerSingleton<GetInsightsUsecase>(GetInsightsUsecase(getIt()));
+  getIt.registerSingleton<GetMpesaSmsUsecase>(GetMpesaSmsUsecase(getIt()));
+  getIt.registerSingleton<RequestSmsPermissionUsecase>(
+      RequestSmsPermissionUsecase(getIt()));
+  getIt.registerSingleton<GetBusinessesUsecase>(GetBusinessesUsecase(getIt()));
+  getIt.registerSingleton<GetBusinessByNameUsecase>(GetBusinessByNameUsecase(getIt()));
+  getIt.registerSingleton<SaveBusinessUsecase>(SaveBusinessUsecase(getIt()));
+  getIt.registerSingleton<GetPersonsUsecase>(GetPersonsUsecase(getIt()));
+  getIt.registerSingleton<SavePersonUsecase>(SavePersonUsecase(getIt()));
 
   /// providers
   getIt.registerSingleton<SettingsProvider>(
@@ -88,6 +130,18 @@ Future<void> initApp() async {
   getIt.registerSingleton<InsightsProvider>(
     InsightsProvider(
       getInsightsUsecase: getIt(),
+    ),
+  );
+  getIt.registerSingleton<SmsProvider>(
+    SmsProvider(
+      getMpesaSmsUsecase: getIt(),
+      requestSmsPermissionUsecase: getIt(),
+      createExpenseEntryUsecase: getIt(),
+      getBusinessesUsecase: getIt(),
+      getBusinessByNameUsecase: getIt(),
+      saveBusinessUsecase: getIt(),
+      getPersonsUsecase: getIt(),
+      savePersonUsecase: getIt(),
     ),
   );
 }

@@ -27,3 +27,8 @@ class CachePutFailure extends Failure {
   @override
   String get msg => "Error saving entry to device";
 }
+
+class NotFoundFailure extends Failure {
+  @override
+  String get msg => "Entry not found in cache";
+}

@@ -20,7 +20,7 @@ class SettingsProvider with ChangeNotifier {
     showCharts: true,
     showEntryDate: false,
     onboardingComplete: false,
-    currency: usd,
+    currency: kes,
   );
 
   late Money _money;
